@@ -91,7 +91,7 @@ class BooksApp extends React.Component {
                 books={this.state.books}
               />
 
-              <Shelf bookShelfCategory={'Read'} books={this.state.books} />
+              <Shelf bookShelfCategory={'read'} books={this.state.books} />
             </div>
           </div>
           <div className="open-search">
