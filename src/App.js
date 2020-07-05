@@ -18,23 +18,10 @@ class BooksApp extends React.Component {
   state = {
     books: [],
     queryResults: [],
-    selectedBookToUpdate: {},
-
-    /**
-     * TODO: Instead of using this state variable to keep track of which page
-     * we're on, use the URL in the browser's address bar. This will ensure that
-     * users can use the browser's back and forward buttons to navigate between
-     * pages, as well as provide a good URL they can bookmark and share.
-     */
-    showSearchPage: false,
   };
 
   componentDidMount() {
-    BooksAPI.getAll().then((books) => {
-      this.setState(() => ({
-        books,
-      }));
-    });
+    this.getAllBooks();
   }
 
   handleSearchSubmit = (e) => {
@@ -44,10 +31,17 @@ class BooksApp extends React.Component {
     });
   };
 
+  getAllBooks = () => {
+    BooksAPI.getAll().then((books) => {
+      this.setState(() => ({
+        books,
+      }));
+    });
+  };
+
   selectBookToAdd = (e) => {
     e.preventDefault();
     const bookId = e.target.value;
-
     console.log('bookId', bookId);
     const splitBookId = bookId.split(',');
     const splitBookIdToSubmitToApi = splitBookId[0];
@@ -55,13 +49,7 @@ class BooksApp extends React.Component {
     BooksAPI.update(
       { id: splitBookIdToSubmitToApi },
       splitShelfToSubmitToApi
-    ).then(
-      BooksAPI.getAll().then((books) => {
-        this.setState(() => ({
-          books,
-        }));
-      })
-    );
+    ).then(this.getAllBooks());
   };
 
   render() {
@@ -102,13 +90,10 @@ class BooksApp extends React.Component {
               <Route
                 exact
                 path="/"
-                render={({ history }) => (
+                render={() => (
                   <Shelf
                     shelfStates={shelfStates}
-                    selectBookToAdd={(e) => {
-                      this.selectBookToAdd(e);
-                      history.push('/');
-                    }}
+                    selectBookToAdd={this.selectBookToAdd}
                     bookShelfCategory={'currentlyReading'}
                     books={this.state.books}
                   />
@@ -118,13 +103,10 @@ class BooksApp extends React.Component {
               <Route
                 exact
                 path="/"
-                render={({ history }) => (
+                render={() => (
                   <Shelf
                     shelfStates={shelfStates}
-                    selectBookToAdd={(e) => {
-                      this.selectBookToAdd(e);
-                      history.push('/');
-                    }}
+                    selectBookToAdd={this.selectBookToAdd}
                     bookShelfCategory={'wantToRead'}
                     books={this.state.books}
                   />
@@ -134,13 +116,10 @@ class BooksApp extends React.Component {
               <Route
                 exact
                 path="/"
-                render={({ history }) => (
+                render={() => (
                   <Shelf
                     shelfStates={shelfStates}
-                    selectBookToAdd={(e) => {
-                      this.selectBookToAdd(e);
-                      history.push('/');
-                    }}
+                    selectBookToAdd={this.selectBookToAdd}
                     bookShelfCategory={'read'}
                     books={this.state.books}
                   />

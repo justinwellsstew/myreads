@@ -51,7 +51,10 @@ class Shelf extends Component {
                                   shelf.category,
                                 ];
                                 return (
-                                  <option key={shelf} value={selectedBookArray}>
+                                  <option
+                                    key={shelf.category}
+                                    value={selectedBookArray}
+                                  >
                                     {shelf.title}
                                   </option>
                                 );
