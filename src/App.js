@@ -6,10 +6,19 @@ import * as BooksAPI from './BooksAPI';
 import { Link, Route } from 'react-router-dom';
 import './App.css';
 
+const shelfStates = [
+  { category: '', title: 'select' },
+  { category: 'None', title: 'none' },
+  { category: 'wantToRead', title: 'What to Read' },
+  { category: 'currentlyReading', title: 'Currently Reading' },
+  { category: 'read', title: 'Read' },
+];
+
 class BooksApp extends React.Component {
   state = {
     books: [],
     queryResults: [],
+    selectedBookToUpdate: {},
 
     /**
      * TODO: Instead of using this state variable to keep track of which page
@@ -19,6 +28,7 @@ class BooksApp extends React.Component {
      */
     showSearchPage: false,
   };
+
   componentDidMount() {
     BooksAPI.getAll().then((books) => {
       this.setState(() => ({
@@ -37,16 +47,21 @@ class BooksApp extends React.Component {
   selectBookToAdd = (e) => {
     e.preventDefault();
     const bookId = e.target.value;
-    BooksAPI.update({ bookId }, 'wantToRead')
-      .then(
-        BooksAPI.getAll().then((books) => {
-          this.setState(() => ({
-            books,
-          }));
-        })
-      )
-      .then((window.location = '/'));
-    console.log('book id:', e.target.value);
+
+    console.log('bookId', bookId);
+    const splitBookId = bookId.split(',');
+    const splitBookIdToSubmitToApi = splitBookId[0];
+    const splitShelfToSubmitToApi = splitBookId[1];
+    BooksAPI.update(
+      { id: splitBookIdToSubmitToApi },
+      splitShelfToSubmitToApi
+    ).then(
+      BooksAPI.getAll().then((books) => {
+        this.setState(() => ({
+          books,
+        }));
+      })
+    );
   };
 
   render() {
@@ -66,9 +81,12 @@ class BooksApp extends React.Component {
           <Route
             exact
             path="/search"
-            render={() => (
+            render={({ history }) => (
               <QueryResults
-                selectBookToAdd={this.selectBookToAdd}
+                selectBookToAdd={(e) => {
+                  this.selectBookToAdd(e);
+                  history.push('/');
+                }}
                 queryResults={this.state.queryResults}
               />
             )}
@@ -81,17 +99,53 @@ class BooksApp extends React.Component {
           </div>
           <div className="list-books-content">
             <div>
-              <Shelf
-                bookShelfCategory={'currentlyReading'}
-                books={this.state.books}
+              <Route
+                exact
+                path="/"
+                render={({ history }) => (
+                  <Shelf
+                    shelfStates={shelfStates}
+                    selectBookToAdd={(e) => {
+                      this.selectBookToAdd(e);
+                      history.push('/');
+                    }}
+                    bookShelfCategory={'currentlyReading'}
+                    books={this.state.books}
+                  />
+                )}
               />
 
-              <Shelf
-                bookShelfCategory={'wantToRead'}
-                books={this.state.books}
+              <Route
+                exact
+                path="/"
+                render={({ history }) => (
+                  <Shelf
+                    shelfStates={shelfStates}
+                    selectBookToAdd={(e) => {
+                      this.selectBookToAdd(e);
+                      history.push('/');
+                    }}
+                    bookShelfCategory={'wantToRead'}
+                    books={this.state.books}
+                  />
+                )}
               />
 
-              <Shelf bookShelfCategory={'read'} books={this.state.books} />
+              <Route
+                exact
+                path="/"
+                render={({ history }) => (
+                  <Shelf
+                    shelfStates={shelfStates}
+                    selectBookToAdd={(e) => {
+                      this.selectBookToAdd(e);
+                      history.push('/');
+                    }}
+                    bookShelfCategory={'read'}
+                    books={this.state.books}
+                  />
+                )}
+              />
             </div>
           </div>
           <div className="open-search">
