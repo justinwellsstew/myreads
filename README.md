@@ -9,8 +9,10 @@ This a simple app that will help you organize your books into categories of want
 ## Setup
 
 To run this project install it using NPM:
-cd /myreads
-$npm install$ npm start
+
+- cd /myreads
+- npm install
+- npm start
 
 ## Sources
 
