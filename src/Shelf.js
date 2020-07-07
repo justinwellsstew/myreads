@@ -7,17 +7,8 @@ class Shelf extends Component {
       books,
       selectBookToAdd,
       shelfStates,
+      shelfTitle,
     } = this.props;
-    let shelfTitle = '';
-    shelfTitle = (bookShelfCategory) => {
-      if (bookShelfCategory === 'currentlyReading') {
-        return (shelfTitle = 'Currently Reading');
-      } else if (bookShelfCategory === 'wantToRead') {
-        return (shelfTitle = 'Want to Read');
-      } else {
-        return (shelfTitle = 'Read');
-      }
-    };
 
     return (
       <div className="bookshelf">
@@ -26,8 +17,6 @@ class Shelf extends Component {
           <ol className="books-grid">
             {books.map((book) => {
               if (book.shelf === bookShelfCategory) {
-                const chosenbookRecord = book.id;
-
                 return (
                   <li key={book.id}>
                     <div className="book">
@@ -47,7 +36,7 @@ class Shelf extends Component {
                             <select onChange={(e) => selectBookToAdd(e)}>
                               {shelfStates.map((shelf) => {
                                 const selectedBookArray = [
-                                  chosenbookRecord,
+                                  book.id,
                                   shelf.category,
                                 ];
                                 return (
@@ -55,7 +44,7 @@ class Shelf extends Component {
                                     key={shelf.category}
                                     value={selectedBookArray}
                                   >
-                                    {shelf.title}
+                                    {shelfTitle(shelf.category)}
                                   </option>
                                 );
                               })}

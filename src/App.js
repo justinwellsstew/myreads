@@ -8,7 +8,7 @@ import './App.css';
 
 const shelfStates = [
   { category: '', title: 'select' },
-  { category: 'None', title: 'none' },
+  { category: 'none', title: 'None' },
   { category: 'wantToRead', title: 'What to Read' },
   { category: 'currentlyReading', title: 'Currently Reading' },
   { category: 'read', title: 'Read' },
@@ -23,12 +23,22 @@ class BooksApp extends React.Component {
   componentDidMount() {
     this.getAllBooks();
   }
-
+  // Take search and query API.  Filter results that don't contain and image or author and then update the query state
   handleSearchSubmit = (e) => {
     const query = e.target.value;
-    BooksAPI.search(query).then((queryResults) => {
-      this.setState(() => ({ queryResults }));
-    });
+    if (typeof query !== 'undefined') {
+      BooksAPI.search(query)
+        .then((queryResults) => {
+          let filteredQuery = [];
+          if (typeof queryResults !== 'undefined' && queryResults.length > 0) {
+            filteredQuery = queryResults.filter((f) => {
+              return f.authors && f.imageLinks;
+            });
+          }
+          this.setState(() => ({ queryResults: filteredQuery }));
+        })
+        .catch((err) => alert(err));
+    }
   };
 
   getAllBooks = () => {
@@ -49,7 +59,21 @@ class BooksApp extends React.Component {
     BooksAPI.update(
       { id: splitBookIdToSubmitToApi },
       splitShelfToSubmitToApi
-    ).then(this.getAllBooks());
+    ).then(this.getAllBooks, this.setState({ queryResults: [] }));
+  };
+
+  shelfTitle = (bookShelfCategory) => {
+    if (bookShelfCategory === 'currentlyReading') {
+      return 'Currently Reading';
+    } else if (bookShelfCategory === 'wantToRead') {
+      return 'Want to Read';
+    } else if (bookShelfCategory === 'read') {
+      return 'Read';
+    } else if (bookShelfCategory === 'none') {
+      return 'None';
+    } else {
+      return 'Select';
+    }
   };
 
   render() {
@@ -71,6 +95,8 @@ class BooksApp extends React.Component {
             path="/search"
             render={({ history }) => (
               <QueryResults
+                shelfTitle={this.shelfTitle}
+                shelfStates={shelfStates}
                 selectBookToAdd={(e) => {
                   this.selectBookToAdd(e);
                   history.push('/');
@@ -92,6 +118,7 @@ class BooksApp extends React.Component {
                 path="/"
                 render={() => (
                   <Shelf
+                    shelfTitle={this.shelfTitle}
                     shelfStates={shelfStates}
                     selectBookToAdd={this.selectBookToAdd}
                     bookShelfCategory={'currentlyReading'}
@@ -105,6 +132,7 @@ class BooksApp extends React.Component {
                 path="/"
                 render={() => (
                   <Shelf
+                    shelfTitle={this.shelfTitle}
                     shelfStates={shelfStates}
                     selectBookToAdd={this.selectBookToAdd}
                     bookShelfCategory={'wantToRead'}
@@ -118,6 +146,7 @@ class BooksApp extends React.Component {
                 path="/"
                 render={() => (
                   <Shelf
+                    shelfTitle={this.shelfTitle}
                     shelfStates={shelfStates}
                     selectBookToAdd={this.selectBookToAdd}
                     bookShelfCategory={'read'}
