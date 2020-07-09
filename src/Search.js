@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { Debounce } from 'react-throttle';
 
 class Search extends Component {
   render() {
@@ -11,11 +12,13 @@ class Search extends Component {
             <button className="close-search">Close the search</button>
           </Link>
           <div className="search-books-input-wrapper">
-            <input
-              type="text"
-              onChange={(e) => handleSearchSubmit(e)}
-              placeholder="Search by title or author"
-            />
+            <Debounce time="1000" handler="onChange">
+              <input
+                type="text"
+                onChange={(e) => handleSearchSubmit(e)}
+                placeholder="Search by title or author"
+              />
+            </Debounce>
             {console.log(this.state)}
           </div>
         </div>
