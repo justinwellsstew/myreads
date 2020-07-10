@@ -18,7 +18,6 @@ class BooksApp extends React.Component {
   state = {
     books: [],
     queryResults: [],
-    filteredBooksAndId: [],
   };
 
   componentDidMount() {
@@ -38,8 +37,10 @@ class BooksApp extends React.Component {
               return f.authors && f.imageLinks;
             });
           }
-          console.log('booksWithId;', this.addShelfToQueryBooks(filteredQuery));
-          this.setState(() => ({ queryResults: filteredQuery }));
+          const fiteredQueryWithShelf = this.addShelfToQueryBooks(
+            filteredQuery
+          );
+          this.setState(() => ({ queryResults: fiteredQueryWithShelf }));
         })
         .catch((err) => alert(err));
     }
@@ -57,26 +58,16 @@ class BooksApp extends React.Component {
   //   this.setState({ queryResults: filteredResults });
   // }
 
+  // get all books from api that have been shelved
   getAllBooks = () => {
     BooksAPI.getAll().then((books) => {
       this.setState(() => ({
         books,
       }));
-      this.booksShelfAndId(books);
     });
   };
 
-  booksShelfAndId = (books) => {
-    let filteredArray = [];
-    books.map((book) => {
-      let newObj = {};
-      newObj.id = book.id;
-      newObj.shelf = book.shelf;
-      filteredArray.push(newObj);
-    });
-    this.setState({ filteredBooksAndId: filteredArray });
-  };
-
+  // take books that have been search from api and add shelf from already shelved books
   addShelfToQueryBooks = (queryBooks) => {
     let queryBooksWithShelf = queryBooks;
     this.state.books.map((book) => {
@@ -84,14 +75,16 @@ class BooksApp extends React.Component {
         if (qbook.id === book.id) {
           queryBooksWithShelf[i].shelf = book.shelf;
           return true;
-        } else {
-          queryBooksWithShelf[i].shelf = 'none';
         }
+        //else {
+        //   queryBooksWithShelf[i].shelf = 'none';
+        // }
       });
     });
     return queryBooksWithShelf;
   };
 
+  // get query from searchbox and search api
   selectBookToAdd = (e) => {
     e.preventDefault();
     const bookId = e.target.value;

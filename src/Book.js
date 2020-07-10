@@ -18,7 +18,10 @@ class Book extends Component {
             />
             <div className="book-shelf-changer">
               {
-                <select onChange={(e) => selectBookToAdd(e)}>
+                <select
+                  value={{ value: book.shelf }}
+                  onChange={(e) => selectBookToAdd(e)}
+                >
                   {shelfStates.map((shelf) => {
                     const selectedBookArray = [book.id, shelf.category];
                     return (
@@ -37,6 +40,11 @@ class Book extends Component {
               {author}
             </div>
           ))}
+          {book.shelf ? (
+            <div className="shelf-title"> shelf: {shelfTitle(book.shelf)}</div>
+          ) : (
+            <div className="shelf-title">shelfunshelved</div>
+          )}
         </div>
       </li>
     );
